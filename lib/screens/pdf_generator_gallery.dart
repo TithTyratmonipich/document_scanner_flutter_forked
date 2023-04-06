@@ -49,7 +49,7 @@ class _PdfGeneratotGalleryState extends State<PdfGeneratotGallery> {
       tempDir.createSync();
       final now = DateTime.now();
       final dateString =
-          "${now.day.toString().padLeft(2, '0')}-${now.month.toString().padLeft(2, '0')}-${now.year}-${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}";
+          "${now.day.toString().padLeft(2, '0')}_${now.month.toString().padLeft(2, '0')}_${now.year}_at_${now.hour.toString().padLeft(2, '0')}_${now.minute.toString().padLeft(2, '0')}";
       final file = File("${tempDir.path}/Doc_$dateString.pdf");
       await file.writeAsBytes(await pdf.save());
       Navigator.of(context).pop(file);
