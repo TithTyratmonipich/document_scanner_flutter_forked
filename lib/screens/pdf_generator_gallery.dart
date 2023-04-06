@@ -50,7 +50,8 @@ class _PdfGeneratotGalleryState extends State<PdfGeneratotGallery> {
       final now = DateTime.now();
       final dateString =
           "${now.day.toString().padLeft(2, '0')}_${now.month.toString().padLeft(2, '0')}_${now.year}_at_${now.hour.toString().padLeft(2, '0')}_${now.minute.toString().padLeft(2, '0')}";
-      final file = File("${tempDir.path}/Doc_$dateString.pdf");
+      final file = File(
+          "${tempDir.path}/${widget.labelsConfig[ScannerLabelsConfig.DOCUMENT_NAME] ?? "Doc_$dateString"}.pdf");
       await file.writeAsBytes(await pdf.save());
       Navigator.of(context).pop(file);
     } catch (e) {
@@ -135,9 +136,12 @@ class _PdfGeneratotGalleryState extends State<PdfGeneratotGallery> {
                         padding: const EdgeInsets.all(3.0),
                         sliver: SliverGrid.count(
                             childAspectRatio: 10.0 / 9.0,
-                            mainAxisSpacing: 1, //horizontal space
-                            crossAxisSpacing: 1, //vertical space
-                            crossAxisCount: 3, //number of images for a row
+                            mainAxisSpacing: 1,
+                            //horizontal space
+                            crossAxisSpacing: 1,
+                            //vertical space
+                            crossAxisCount: 3,
+                            //number of images for a row
                             children: files
                                 .map((image) => Hero(
                                       tag: image.path,
