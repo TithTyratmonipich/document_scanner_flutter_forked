@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:document_scanner_flutter/configs/configs.dart';
 import 'package:document_scanner_flutter/screens/photo_viewer.dart';
+import 'package:document_scanner_flutter/screens/text_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:path_provider/path_provider.dart';
@@ -31,7 +32,7 @@ class _PdfGeneratotGalleryState extends State<PdfGeneratotGallery> {
     }
   }
 
-  onDone() async {
+  Future<File?> onDone(String title) async {
     final pdf = pw.Document();
     for (var file in files) {
       pdf.addPage(pw.Page(build: (pw.Context context) {
@@ -51,9 +52,10 @@ class _PdfGeneratotGalleryState extends State<PdfGeneratotGallery> {
       final dateString =
           "${now.day.toString().padLeft(2, '0')}_${now.month.toString().padLeft(2, '0')}_${now.year}_at_${now.hour.toString().padLeft(2, '0')}_${now.minute.toString().padLeft(2, '0')}";
       final file = File(
-          "${tempDir.path}/${widget.labelsConfig[ScannerLabelsConfig.DOCUMENT_NAME] ?? "Doc_$dateString"}.pdf");
+          "${tempDir.path}/${title != "" ? "$title" : "Doc_$dateString"}.pdf");
       await file.writeAsBytes(await pdf.save());
-      Navigator.of(context).pop(file);
+      Navigator.of(context).pop();
+      return file;
     } catch (e) {
       String message = "Unkown Error";
       if (e is FileSystemException) {
@@ -212,8 +214,33 @@ class _PdfGeneratotGalleryState extends State<PdfGeneratotGallery> {
                             title: widget.labelsConfig[ScannerLabelsConfig
                                     .PDF_GALLERY_DONE_LABEL] ??
                                 "Done",
-                            textColor: Colors.white,
-                            onTap: onDone,
+                            textColor: Colors.white, onTap: () async {
+                      try {
+                        await showDialog(
+                          context: context,
+                          builder: (context) {
+                            return TextDialog(
+                              title: widget.labelsConfig[ScannerLabelsConfig
+                                  .TEXT_DIALOG_TITLE] ?? "Please name the file",
+                              confirmButtonTitle: widget.labelsConfig[ScannerLabelsConfig
+                                  .TEXT_DIALOG_CONFIRM_BUTTON] ?? "Confirm",
+                              cancelButtonTitle: widget.labelsConfig[ScannerLabelsConfig
+                                  .TEXT_DIALOG_CANCEL_BUTTON] ?? "Cancel",
+                              onPress1: (String value) async {
+                                /// then set file to list
+                                final file = await onDone(value);
+                                Navigator.of(context).pop(file);
+                              },
+                              onPress2: () {
+                                Navigator.of(context).pop();
+                              },
+                            );
+                          },
+                        );
+                      } catch (e) {
+                        print("error show dialog: $e");
+                      }
+                    },
                             radius: BorderRadius.only(
                                 topLeft: Radius.circular(25),
                                 bottomLeft: Radius.circular(25)))),
